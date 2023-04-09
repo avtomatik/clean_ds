@@ -11,8 +11,9 @@ from pathlib import PosixPath
 from typing import Union
 
 import pandas as pd
-from lib.collect import collect_usa_general
 from pandas import DataFrame
+
+from thesis.src.lib.collect import combine_usa_general
 
 
 def read_frugal(io: Union[str, PosixPath], call: callable) -> DataFrame:
@@ -37,4 +38,4 @@ def read_frugal(io: Union[str, PosixPath], call: callable) -> DataFrame:
     return pd.read_excel(io, index_col=0)
 
 
-read_frugal('temporary_dataset.xlsx', collect_usa_general)
+read_frugal('temporary_dataset.xlsx', combine_usa_general)

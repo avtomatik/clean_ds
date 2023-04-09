@@ -10,8 +10,9 @@ import os
 from pathlib import Path
 
 import pandas as pd
-from lib.push import push_data_frame_to_csv_zip
 from pandas import DataFrame
+
+from thesis.src.lib.push import push_data_frame_to_csv_zip
 
 
 def transform(df: DataFrame) -> DataFrame:

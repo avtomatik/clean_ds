@@ -6,17 +6,16 @@ Created on Sun Mar 26 15:26:09 2023
 @author: green-machine
 """
 
-import os
 from pathlib import PosixPath
 from typing import Union
 
 import pandas as pd
 from pandas import DataFrame
 
-from thesis.src.lib.collect import combine_usa_general
+from thesis.src.lib.combine import combine_usa_general
 
 
-def read_frugal(io: Union[str, PosixPath], call: callable) -> DataFrame:
+def read_frugal(filepath_or_buffer: Union[str, PosixPath], func: callable) -> DataFrame:
     """
 
 
@@ -24,7 +23,7 @@ def read_frugal(io: Union[str, PosixPath], call: callable) -> DataFrame:
     ----------
     io : Union[str, PosixPath]
         DESCRIPTION.
-    call : callable
+    func : callable
         Some Collect Function.
 
     Returns
@@ -33,9 +32,13 @@ def read_frugal(io: Union[str, PosixPath], call: callable) -> DataFrame:
         DESCRIPTION.
 
     """
-    if not os.path.exists(io):
-        call().to_excel(io)
-    return pd.read_excel(io, index_col=0)
+    if not filepath_or_buffer.exists():
+        func().to_csv(filepath_or_buffer)
+    kwargs = {
+        'filepath_or_buffer': filepath_or_buffer,
+        'index_col': 0,
+    }
+    return pd.read_csv(**kwargs)
 
 
-read_frugal('temporary_dataset.xlsx', combine_usa_general)
+read_frugal('temporary_dataset.csv', combine_usa_general)

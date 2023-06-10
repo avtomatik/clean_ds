@@ -20,7 +20,7 @@ def main():
     }
     df = DataFrame(
         zip(data.keys(), data.values()),
-        columns=['parties', 'percentages', ]
+        columns=['parties', 'percentages']
     )
     df['corrected'] = df.iloc[:, 1].div(df.iloc[:, 1].sum())
     return df

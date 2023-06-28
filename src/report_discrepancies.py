@@ -28,7 +28,7 @@ FILE_NAME = 'cherkizovo.xlsx'
 #     df.columns = map(transliterate, df.columns)
 #     df.pipe(trim_columns).to_csv(
 #         Path(DIR).joinpath(
-#             f"data_{int(os.path.splitext(file_name)[0]):04n}.csv"),
+#             f"data_{int(Path(file_name).stem):04n}.csv"),
 #         index=False
 #     )
 #     os.unlink(Path(DIR).joinpath(file_name))

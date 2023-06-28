@@ -71,4 +71,4 @@ df['gr_c_cum'] = df.iloc[:, 9].add(1).cumprod()
 # Chain-Weighted Real GDP, Base Year = 'year_base'
 # =============================================================================
 df['gdp_r'] = df.iloc[:, 10].mul(df.iloc[year_base, 4]).div(df.iloc[year_base, 10])
-df = df.iloc[:, (0, 1, 2, 3, 4, 11)]
+df = df.iloc[:, [0, 1, 2, 3, 4, 11]]

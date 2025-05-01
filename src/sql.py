@@ -45,9 +45,9 @@ def get_sqlite3_cursor():
     con.executemany(stmt, data)
     con.commit()
 
-    cursor = con.execute('select * from test')
+    cursor = con.execute('SELECT * FROM test')
     rows = cursor.fetchall()
-    print(sql.read_sql('select * from test', con))
+    print(sql.read_sql('SELECT * FROM test', con))
 
 
 def get_data_frame_mongo():

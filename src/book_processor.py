@@ -91,7 +91,7 @@ class BookNormalizer:
                         book[key] = item.split(':', 1)[-1].strip()
 
         # Normalize price
-        book['Цена'] = self.price_parser.extract(book['Цена'])
+        book['Цена'] = str(self.price_parser.extract(book['Цена']))
 
         return book
 

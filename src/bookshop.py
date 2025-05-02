@@ -15,19 +15,21 @@ FILE_NAME_DST = 'books_plus.csv'
 
 
 def main():
-    input_path = PATH / FILE_NAME_SRC
-    output_path = PATH / FILE_NAME_DST
+    file_path_src = PATH / FILE_NAME_SRC
+    file_path_dst = PATH / FILE_NAME_DST
 
-    reader = BookReader(input_path)
+    reader = BookReader(file_path_src)
     raw_books = reader.read_books()
 
     normalizer = BookNormalizer(PriceParser())
     normalized_books = [normalizer.normalize(book) for book in raw_books]
 
-    writer = BookWriter(output_path)
+    writer = BookWriter(file_path_dst)
     writer.write(normalized_books)
 
-    print(f'Successfully saved {len(normalized_books)} books to {output_path}')
+    print(
+        f'Successfully saved {len(normalized_books)} books to {file_path_dst}'
+    )
 
 
 if __name__ == '__main__':

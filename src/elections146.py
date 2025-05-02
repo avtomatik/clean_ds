@@ -7,7 +7,7 @@ Created on Wed Sep 22 22:23:22 2021
 
 import pandas as pd
 
-from config import ELECTION_RESULTS
+from samples import ELECTION_RESULTS
 
 
 def get_election_results(data: dict[str, float]) -> pd.DataFrame:

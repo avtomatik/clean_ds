@@ -6,14 +6,9 @@ Created on Mon Nov 21 18:37:49 2022
 @author: green-machine
 """
 
-import os
-import zipfile
 from itertools import combinations
-from pathlib import Path
-from zipfile import ZipFile
 
 import pandas as pd
-from pandas import DataFrame
 
 from config import PATH
 
@@ -47,7 +42,7 @@ FILE_NAME = 'cherkizovo.xlsx'
 # Step 2
 # =============================================================================
 # =============================================================================
-# total = DataFrame()
+# total = pd.DataFrame()
 # with ZipFile(PATH.joinpath(ARCHIVE_NAME), 'w') as archive:
 #     for item in archive.filelist:
 #         with archive.open(item.filename) as f:

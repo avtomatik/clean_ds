@@ -1,11 +1,11 @@
 import json
 import sqlite3
 
+import pandas as pd
 import pandas.io.sql as sql
 import psycopg2
 import pymongo
 import requests
-from pandas import DataFrame
 
 
 def get_psql_cursor():
@@ -29,7 +29,7 @@ def get_sqlite3_cursor():
       b VARCHAR(20),
       c REAL,
       d INTEGER
-      )
+    )
     ;
 """
     con = sqlite3.connect(':memory:')
@@ -64,4 +64,4 @@ def get_data_frame_mongo():
     cursor = tweets.find({'from_user': 'wesmckinn'})
 
     tweet_fields = ['created_at', 'from_user', 'id', 'text']
-    result = DataFrame(list(cursor), columns=tweet_fields)
+    result = pd.DataFrame(list(cursor), columns=tweet_fields)

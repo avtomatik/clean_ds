@@ -13,7 +13,6 @@ Chain-Weighted GDP
 
 import numpy as np
 import pandas as pd
-from pandas import DataFrame
 
 pd.options.display.max_columns = 10
 
@@ -34,7 +33,7 @@ data = {
     'quantity_b': [25 + 5 * _ for _ in range(length)],
 }
 
-df = DataFrame.from_dict(data)
+df = pd.DataFrame.from_dict(data)
 df.set_index(df.columns[0], inplace=True)
 # =============================================================================
 # GDP Weighted Current Year`s Prices, i. e. Nominal GDP

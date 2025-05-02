@@ -6,6 +6,7 @@ Created on Mon Nov 21 18:37:49 2022
 @author: green-machine
 """
 
+import io
 import zipfile
 from itertools import combinations
 
@@ -17,59 +18,35 @@ from funcs import transliterate, trim_columns
 ARCHIVE_NAME = 'cherkizovo.zip'
 FILE_NAME = 'cherkizovo.xlsx'
 
-# =============================================================================
-# Step 1
-# =============================================================================
-csv_paths = []
 
-# Process Excel files and collect CSV paths
-for file_path in DATA_PATH.iterdir():
-    if not file_path.is_file() or file_path.suffix != '.xlsx':
-        continue
-    df = pd.read_excel(file_path, skiprows=[1])
-    df.columns = map(transliterate, df.columns)
-    csv_path = DATA_PATH / f'data_{int(file_path.stem):04n}.csv'
-    df.pipe(trim_columns).to_csv(csv_path, index=False)
-    csv_paths.append(csv_path)
-    file_path.unlink()
+archive_path = DATA_PATH / ARCHIVE_NAME
 
-# Archive all generated CSVs
-with zipfile.ZipFile(DATA_PATH / ARCHIVE_NAME, 'w') as archive:
-    for csv_path in csv_paths:
-        archive.write(
-            csv_path,
-            arcname=csv_path.name,
-            compress_type=zipfile.ZIP_DEFLATED
-        )
-        csv_path.unlink()
-
-
-# =============================================================================
-# Step 2
-# =============================================================================
-df_total = pd.DataFrame()
-
+# Step 1 & 2: Process .xlsx files, archive to ZIP in-memory, and collect DataFrames
 data_chunks = []
+with zipfile.ZipFile(archive_path, 'w') as archive:
+    for file_path in DATA_PATH.iterdir():
+        if not file_path.is_file() or file_path.suffix != '.xlsx':
+            continue
 
-with zipfile.ZipFile(DATA_PATH / ARCHIVE_NAME, 'w') as archive:
-    for file in archive.filelist:
-        with archive.open(file.filename) as f:
-            df = pd.read_csv(f)
-            df['source'] = file.filename
-            data_chunks.append(df)
+        chunk = pd.read_excel(file_path, skiprows=[1])
+        chunk.columns = map(transliterate, chunk.columns)
+        chunk_cleaned = trim_columns(chunk)
 
+        # Write cleaned CSV into archive (in memory)
+        csv_buffer = io.StringIO()
+        chunk_cleaned.to_csv(csv_buffer, index=False)
+        csv_name = f'data_{int(file_path.stem):04n}.csv'
+        archive.writestr(csv_name, csv_buffer.getvalue())
 
-df_total = pd.concat(data_chunks, ignore_index=True)
+        # Add to in-memory collection
+        chunk_cleaned['source'] = csv_name
+        data_chunks.append(chunk_cleaned)
 
-df_total = df_total[
-    [col for col in df_total.columns if col != 'source'] + ['source']
-]
+        file_path.unlink()
 
-df_total.to_excel(DATA_PATH / FILE_NAME, index=False)
-
-#
-
-df = pd.read_excel(DATA_PATH / FILE_NAME)
+# Step 3: Combine all into one final DataFrame
+df = pd.concat(data_chunks, ignore_index=True)
+df = df[[col for col in df.columns if col != 'source'] + ['source']]
 
 plan_breakdown = {}
 

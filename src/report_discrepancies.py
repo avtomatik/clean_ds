@@ -8,11 +8,11 @@ Created on Mon Nov 21 18:37:49 2022
 
 import zipfile
 from itertools import combinations
-from pathlib import Path
 
 import pandas as pd
 
 from config import BASE_PATH
+from funcs import trim_columns
 
 ARCHIVE_NAME = 'cherkizovo.zip'
 FILE_NAME = 'cherkizovo.xlsx'
@@ -21,28 +21,38 @@ FILE_NAME = 'cherkizovo.xlsx'
 # Step 1
 # =============================================================================
 
-for file_name in tuple(os.listdir(BASE_PATH)):
-    df = pd.read_excel(BASE_PATH.joinpath(file_name), skiprows=[1])
-    df.columns = map(transliterate, df.columns)
-    df.pipe(trim_columns).to_csv(
-        BASE_PATH.joinpath(
-            f'data_{int(Path(file_name).stem):04n}.csv'),
-        index=False
-    )
-    os.unlink(BASE_PATH.joinpath(file_name))
 
-file_names = tuple(os.listdir(BASE_PATH))
-with zipfile.ZipFile(BASE_PATH.joinpath(ARCHIVE_NAME), 'w') as archive:
-    for file_name in file_names:
-        archive.write(BASE_PATH.joinpath(file_name),
-                      compress_type=zipfile.ZIP_DEFLATED)
-        os.unlink(BASE_PATH.joinpath(file_name))
+# Process Excel files
+for file_path in BASE_PATH.iterdir():
+    df = pd.read_excel(file_path, skiprows=[1])
+    df.columns = map(transliterate, df.columns)
+    (
+        df
+        .pipe(trim_columns)
+        .to_csv(
+            BASE_PATH / f'data_{int(file_path.stem):04n}.csv',
+            index=False
+        )
+    )
+    file_path.unlink()
+
+# Archive CSV files
+file_paths = tuple(BASE_PATH.iterdir())
+with zipfile.ZipFile(BASE_PATH / ARCHIVE_NAME, 'w') as archive:
+    for file_path in file_paths:
+        archive.write(
+            file_path,
+            arcname=file_path.name,
+            compress_type=zipfile.ZIP_DEFLATED
+        )
+        file_path.unlink()
+
 
 # =============================================================================
 # Step 2
 # =============================================================================
 df_total = pd.DataFrame()
-with zipfile.ZipFile(BASE_PATH.joinpath(ARCHIVE_NAME), 'w') as archive:
+with zipfile.ZipFile(BASE_PATH / ARCHIVE_NAME, 'w') as archive:
     for item in archive.filelist:
         with archive.open(item.filename) as f:
             chunk = pd.read_csv(f)

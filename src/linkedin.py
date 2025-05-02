@@ -7,64 +7,19 @@ Created on Fri Oct 21 10:49:26 2022
 
 
 import dask.dataframe as dd
+import databricks.koalas as ks
 import numpy as np
 import pandas as pd
-# =============================================================================
-# Start Here
-# =============================================================================
-import seaborn as sns
-from sklearn.datasets import load_iris
 
-
-def olympics():
-    return
-    # =========================================================================
-    # theolympicsguy@gmail.com
-    # =========================================================================
-    oo = pd.read_csv('..\\data\\olympics_medals_country_wise.csv')
-
+from config import DATA_PATH
 
 # =============================================================================
-# Brett Vanderblock
+# Source: theolympicsguy@gmail.com
 # =============================================================================
-# =============================================================================
-# TODO: https://www.databricks.com/: Databricks community edition: to sign up
-# =============================================================================
-iris = load_iris()
-iris = pd.concat(
-    [
-        pd.DataFrame(
-            data=iris.data,
-            columns=("sepal length", "sepal width",
-                     "petal length", "petal width")
-        ),
-        pd.DataFrame(data=iris.target, columns=("species",))
-    ],
-    axis=1
-)
-# # =============================================================================
-# # Boxplot
-# # =============================================================================
-# iris.boxplot()
+FILE_NAME = 'olympics_medals_country_wise.csv'
 
-# =============================================================================
-# Correlation Matrix
-# =============================================================================
-# =============================================================================
-# Another Implementation
-# =============================================================================
-# iris.corr().style.background_gradient(cmap='RdYlGn', axis=None)
-sns.heatmap(iris.corr(), annot=True)
 
-# =============================================================================
-# colors = {
-#     "versicolor": "red",
-#     "setosa": "green",
-#     "virginica": "blue",
-# }
-# iris["colors"] = iris["species"].map(colors)
-# iris.plot.scatter(x="sepal_width", y="sepal_length", color=iris["colors"])
-# =============================================================================
+file_path = DATA_PATH.joinpath(FILE_NAME)
 
 
 def showcase_dask_dataframe():
@@ -72,10 +27,7 @@ def showcase_dask_dataframe():
     # Dask DataFrame
     # =========================================================================
 
-    df = dd.read_csv(
-        '..\\data\\olympics_medals_country_wise.csv',
-        thousands=','
-    )
+    df = dd.read_csv(file_path, thousands=',')
     print(df.head())
 
 
@@ -87,17 +39,19 @@ showcase_dask_dataframe()
 # =============================================================================
 
 
-# import databricks.koalas as ks
+# =============================================================================
 # from pyspark.sql import SparkSession
+# =============================================================================
 
 
+pdf = pd.DataFrame(np.random.randn(6, 4), columns=list('ABCD'))
+pdf.head()
+
 # =============================================================================
-# pdf = pd.DataFrame(np.random.randn(6, 4), columns=list('ABCD'))
-# pdf.head()
-#
-# kdf = ks.from_pandas(pdf)
-# kdf.head()
+# TODO: https://www.databricks.com/: Databricks community edition: to sign up
 # =============================================================================
+kdf = ks.from_pandas(pdf)
+kdf.head()
 
 
 # =============================================================================

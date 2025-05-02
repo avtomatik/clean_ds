@@ -6,57 +6,57 @@ Created on Mon Nov 21 18:37:49 2022
 @author: green-machine
 """
 
+import zipfile
 from itertools import combinations
+from pathlib import Path
 
 import pandas as pd
 
-from config import PATH
+from config import BASE_PATH
 
 ARCHIVE_NAME = 'cherkizovo.zip'
 FILE_NAME = 'cherkizovo.xlsx'
+
 # =============================================================================
 # Step 1
 # =============================================================================
 
-# =============================================================================
-# for file_name in tuple(os.listdir(BASE_DIR)):
-#     df = pd.read_excel(PATH.joinpath(file_name), skiprows=[1])
-#     df.columns = map(transliterate, df.columns)
-#     df.pipe(trim_columns).to_csv(
-#         PATH.joinpath(
-#             f'data_{int(Path(file_name).stem):04n}.csv'),
-#         index=False
-#     )
-#     os.unlink(PATH.joinpath(file_name))
-# =============================================================================
+for file_name in tuple(os.listdir(BASE_PATH)):
+    df = pd.read_excel(BASE_PATH.joinpath(file_name), skiprows=[1])
+    df.columns = map(transliterate, df.columns)
+    df.pipe(trim_columns).to_csv(
+        BASE_PATH.joinpath(
+            f'data_{int(Path(file_name).stem):04n}.csv'),
+        index=False
+    )
+    os.unlink(BASE_PATH.joinpath(file_name))
 
-# =============================================================================
-# file_names = tuple(os.listdir(BASE_DIR))
-# with ZipFile(PATH.joinpath(ARCHIVE_NAME), 'w') as archive:
-#     for file_name in file_names:
-#         archive.write(PATH.joinpath(file_name), compress_type=zipfile.ZIP_DEFLATED)
-#         os.unlink(PATH.joinpath(file_name))
-# =============================================================================
+file_names = tuple(os.listdir(BASE_PATH))
+with zipfile.ZipFile(BASE_PATH.joinpath(ARCHIVE_NAME), 'w') as archive:
+    for file_name in file_names:
+        archive.write(BASE_PATH.joinpath(file_name),
+                      compress_type=zipfile.ZIP_DEFLATED)
+        os.unlink(BASE_PATH.joinpath(file_name))
 
 # =============================================================================
 # Step 2
 # =============================================================================
-# =============================================================================
-# total = pd.DataFrame()
-# with ZipFile(PATH.joinpath(ARCHIVE_NAME), 'w') as archive:
-#     for item in archive.filelist:
-#         with archive.open(item.filename) as f:
-#             chunk = pd.read_csv(f)
-#             chunk['source'] = item.filename
-#             total = pd.concat([total, chunk])
-# =============================================================================
+df_total = pd.DataFrame()
+with zipfile.ZipFile(BASE_PATH.joinpath(ARCHIVE_NAME), 'w') as archive:
+    for item in archive.filelist:
+        with archive.open(item.filename) as f:
+            chunk = pd.read_csv(f)
+            chunk['source'] = item.filename
+            df_total = pd.concat([df_total, chunk])
 
-# columns = list(total.columns)
-# columns.remove('source')
-# total = total.reindex(columns=columns + ['source'])
-# total.to_excel(PATH.joinpath(FILE_NAME), index=False)
+columns = list(df_total.columns)
+columns.remove('source')
+df_total = df_total.reindex(columns=columns + ['source'])
+df_total.to_excel(BASE_PATH.joinpath(FILE_NAME), index=False)
 
-df = pd.read_excel(PATH.joinpath(FILE_NAME))
+#
+
+df = pd.read_excel(BASE_PATH.joinpath(FILE_NAME))
 plan_breakdown = {}
 for _ in range(df.shape[0]):
     if df.iloc[_, -1] == 'Y':
@@ -67,7 +67,7 @@ for _ in range(df.shape[0]):
         plan_breakdown[plan][detailed].add(df.iloc[_, -2])
 
 FILE_NAME = 'cherkizovo_diff_report.txt'
-with open(PATH.joinpath(FILE_NAME), 'w') as f:
+with open(BASE_PATH.joinpath(FILE_NAME), 'w') as f:
     for plan, value in plan_breakdown.items():
         print('#' * 100, file=f)
         print(f'{plan:^100}', file=f)

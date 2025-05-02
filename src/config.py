@@ -11,4 +11,8 @@ from pathlib import Path
 
 BASE_DIR = '/Users/alexandermikhailov/Downloads/'
 
-PATH = Path(BASE_DIR)
+DATA_DIR = '..\\data'
+
+BASE_PATH = Path(BASE_DIR)
+
+DATA_PATH = Path(DATA_DIR)

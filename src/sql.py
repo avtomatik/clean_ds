@@ -32,9 +32,9 @@ def get_sqlite3_cursor():
     )
     ;
 """
-    con = sqlite3.connect(':memory:')
-    con.execute(query)
-    con.commit()
+    conn = sqlite3.connect(':memory:')
+    conn.execute(query)
+    conn.commit()
 
     data = [
         ('Atlanta', 'Georgia', 1.25, 6),
@@ -42,18 +42,18 @@ def get_sqlite3_cursor():
         ('Sacramento', 'California', 1.7, 5),
     ]
     stmt = "INSERT INTO test VALUES(?, ?, ?, ?)"
-    con.executemany(stmt, data)
-    con.commit()
+    conn.executemany(stmt, data)
+    conn.commit()
 
-    cursor = con.execute('SELECT * FROM test')
+    cursor = conn.execute('SELECT * FROM test')
     rows = cursor.fetchall()
-    print(sql.read_sql('SELECT * FROM test', con))
+    print(sql.read_sql('SELECT * FROM test', conn))
 
 
 def get_data_frame_mongo():
-    con = pymongo.MongoClient('localhost', 27017)
+    conn = pymongo.MongoClient('localhost', 27017)
 
-    tweets = con.db.tweets
+    tweets = conn.db.tweets
 
     url = 'http://search.twitter.com/search.json?q=python%20pandas'
     data = json.loads(requests.get(url).text)

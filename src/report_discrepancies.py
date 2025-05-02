@@ -11,8 +11,8 @@ from itertools import combinations
 
 import pandas as pd
 
-from config import BASE_PATH
-from funcs import trim_columns
+from config import BASE_PATH, DATA_PATH
+from funcs import transliterate, trim_columns
 
 ARCHIVE_NAME = 'cherkizovo.zip'
 FILE_NAME = 'cherkizovo.xlsx'
@@ -20,54 +20,59 @@ FILE_NAME = 'cherkizovo.xlsx'
 # =============================================================================
 # Step 1
 # =============================================================================
+csv_paths = []
 
-
-# Process Excel files
-for file_path in BASE_PATH.iterdir():
+# Process Excel files and collect CSV paths
+for file_path in DATA_PATH.iterdir():
+    if not file_path.is_file() or file_path.suffix != '.xlsx':
+        continue
     df = pd.read_excel(file_path, skiprows=[1])
     df.columns = map(transliterate, df.columns)
-    (
-        df
-        .pipe(trim_columns)
-        .to_csv(
-            BASE_PATH / f'data_{int(file_path.stem):04n}.csv',
-            index=False
-        )
-    )
+    csv_path = DATA_PATH / f'data_{int(file_path.stem):04n}.csv'
+    df.pipe(trim_columns).to_csv(csv_path, index=False)
+    csv_paths.append(csv_path)
     file_path.unlink()
 
-# Archive CSV files
-file_paths = tuple(BASE_PATH.iterdir())
-with zipfile.ZipFile(BASE_PATH / ARCHIVE_NAME, 'w') as archive:
-    for file_path in file_paths:
+# Archive all generated CSVs
+with zipfile.ZipFile(DATA_PATH / ARCHIVE_NAME, 'w') as archive:
+    for csv_path in csv_paths:
         archive.write(
-            file_path,
-            arcname=file_path.name,
+            csv_path,
+            arcname=csv_path.name,
             compress_type=zipfile.ZIP_DEFLATED
         )
-        file_path.unlink()
+        csv_path.unlink()
 
 
 # =============================================================================
 # Step 2
 # =============================================================================
 df_total = pd.DataFrame()
-with zipfile.ZipFile(BASE_PATH / ARCHIVE_NAME, 'w') as archive:
-    for item in archive.filelist:
-        with archive.open(item.filename) as f:
-            chunk = pd.read_csv(f)
-            chunk['source'] = item.filename
-            df_total = pd.concat([df_total, chunk])
 
-columns = list(df_total.columns)
-columns.remove('source')
-df_total = df_total.reindex(columns=columns + ['source'])
-df_total.to_excel(BASE_PATH.joinpath(FILE_NAME), index=False)
+data_chunks = []
+
+with zipfile.ZipFile(DATA_PATH / ARCHIVE_NAME, 'w') as archive:
+    for file in archive.filelist:
+        with archive.open(file.filename) as f:
+            df = pd.read_csv(f)
+            df['source'] = file.filename
+            data_chunks.append(df)
+
+
+df_total = pd.concat(data_chunks, ignore_index=True)
+
+df_total = df_total[
+    [col for col in df_total.columns if col != 'source'] + ['source']
+]
+
+df_total.to_excel(DATA_PATH / FILE_NAME, index=False)
 
 #
 
-df = pd.read_excel(BASE_PATH.joinpath(FILE_NAME))
+df = pd.read_excel(DATA_PATH / FILE_NAME)
+
 plan_breakdown = {}
+
 for _ in range(df.shape[0]):
     if df.iloc[_, -1] == 'Y':
         plan = df.iloc[_, -4]
@@ -77,7 +82,8 @@ for _ in range(df.shape[0]):
         plan_breakdown[plan][detailed].add(df.iloc[_, -2])
 
 FILE_NAME = 'cherkizovo_diff_report.txt'
-with open(BASE_PATH.joinpath(FILE_NAME), 'w') as f:
+
+with (BASE_PATH / FILE_NAME).open('w') as f:
     for plan, value in plan_breakdown.items():
         print('#' * 100, file=f)
         print(f'{plan:^100}', file=f)

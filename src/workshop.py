@@ -13,7 +13,7 @@ import numpy as np
 import pandas as pd
 from pandas.plotting import scatter_matrix
 
-from config import DATA_PATH
+from config import DATA_DIR
 
 # =============================================================================
 # import geopandas
@@ -27,7 +27,7 @@ from config import DATA_PATH
 # Source: theolympicsguy@gmail.com
 # =============================================================================
 FILE_NAME = 'olympics_medals_country_wise.csv'
-FILE_PATH = DATA_PATH / FILE_NAME
+FILE_PATH = DATA_DIR / FILE_NAME
 
 
 def load_with_dask(file_path: str) -> dd.DataFrame:

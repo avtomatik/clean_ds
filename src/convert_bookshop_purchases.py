@@ -8,13 +8,11 @@ Created on Fri May  5 21:28:58 2023
 
 
 from book_processor import BookNormalizer, BookReader, BookWriter, PriceParser
-from config import BASE_PATH
-
-FILE_NAME = 'books_plus.txt'
+from config import BOOKS_NAME, DATA_DIR
 
 
 def main():
-    file_path_src = BASE_PATH / FILE_NAME
+    file_path_src = DATA_DIR / BOOKS_NAME
     file_path_dst = file_path_src.with_suffix('.csv')
 
     reader = BookReader(file_path_src)

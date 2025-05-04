@@ -14,11 +14,8 @@ from pathlib import Path
 
 import pandas as pd
 
-from config import BASE_PATH, DATA_PATH
+from config import ARCHIVE_NAME, DATA_DIR, TEXT_REPORT_NAME
 from funcs import transliterate, trim_columns
-
-ARCHIVE_NAME = 'cherkizovo.zip'
-TEXT_REPORT_NAME = 'cherkizovo_diff_report.txt'
 
 
 class FileHandler(ABC):
@@ -198,9 +195,9 @@ def main():
     report_generator = ReportGenerator()
 
     processor = DataProcessor(file_handler, archive_handler, report_generator)
-    archive_path = DATA_PATH / ARCHIVE_NAME
-    text_report_path = BASE_PATH / TEXT_REPORT_NAME
-    processor.process_files(DATA_PATH, archive_path, text_report_path)
+    archive_path = DATA_DIR / ARCHIVE_NAME
+    text_report_path = DATA_DIR / TEXT_REPORT_NAME
+    processor.process_files(DATA_DIR, archive_path, text_report_path)
 
 
 if __name__ == '__main__':
